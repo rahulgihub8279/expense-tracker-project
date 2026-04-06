@@ -17,7 +17,6 @@ function App() {
           <Route path="dashboard" element={<Dashboard></Dashboard>}></Route>
           <Route path="report" element={<Report></Report>}></Route>
         </Route>
-
         <Route path="/*" element={<BadRequest></BadRequest>}></Route>
       </Routes>
     </BrowserRouter>

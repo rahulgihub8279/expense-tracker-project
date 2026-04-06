@@ -5,8 +5,11 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import { Layout, Image, Menu, Button } from "antd";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 const { Sider, Header, Content, Footer } = Layout;
+import useSWR from "swr";
+import fetcher from "../../../Utils/fetcher";
+import Loader from "../../shared/Loader";
 
 export default function Userlayout() {
   const items = [
@@ -27,7 +30,19 @@ export default function Userlayout() {
   const handleNavigate = (menu) => {
     navigate(menu.key);
   };
-
+  const {
+    data: session,
+    error,
+    isLoading,
+  } = useSWR("/api/user/session", fetcher);
+  
+  if(isLoading){
+    return <Loader></Loader>
+  }
+  if((!session && session?.role!=="user" )|| error){
+    return <Navigate to="/"></Navigate>
+  }
+  
   return (
     <>
       <Layout className="min-h-screen!">
@@ -57,6 +72,7 @@ export default function Userlayout() {
             ></Button>
             <Button className="bg-red-500! text-white!">log out</Button>
           </Header>
+          {""}
           <Content>
             <Outlet></Outlet>
           </Content>
