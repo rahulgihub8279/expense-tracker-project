@@ -61,24 +61,45 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "incorrect password" });
     }
     const token = await createToken(user);
+
     res.cookie("authToken", token, {
       maxAge: 86400000,
-      domain: undefined, 
+      domain: undefined,
       smaeSite: process.env.ENVIRONMENT === "DEV" ? "lax" : "none",
       secure: process.env.ENVIRONMENT === "DEV" ? false : true,
       httpOnly: true,
       path: "/",
-    }); 
-    res.json({ message: "login successfully", role: user.role });
+    });
+    res.json({
+      message: "login successfully",
+      role: user.role,
+      username: user.fullname,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-export const verifyToken=async(req,res)=>{
-  try{ 
-    res.json("verification success")
-  }catch(err){
-    res.status(500).json({message:err.message})
+export const logoutUser = async (req, res) => {
+  try {
+    res.cookie("authToken", null, {
+      maxAge: 0,
+      domain: undefined,
+      smaeSite: process.env.ENVIRONMENT === "DEV" ? "lax" : "none",
+      secure: process.env.ENVIRONMENT === "DEV" ? false : true,
+      httpOnly: true,
+      path: "/",
+    });
+    res.status(200).json({ message: "logout successfully" });
+  } catch (err) {
+    res.status(401).json({ message: err.message || "Logout Failed" });
   }
-}
+};
+
+export const verifyToken = async (req, res) => {
+  try {
+    res.json("verification success");
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

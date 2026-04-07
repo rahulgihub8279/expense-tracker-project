@@ -5,7 +5,7 @@ import {
   PhoneOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HomeLayout from "../../layout/HomeLayout";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -20,6 +20,7 @@ export default function Signup() {
   const [formData, setFormData] = useState(null);
   const [otp, setOtp] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate=useNavigate();
 
   const onFinish = async (values) => {
     try {
@@ -46,6 +47,7 @@ export default function Signup() {
       setOtp(null);
       setFormData(null);
       signupForm.resetFields();
+      navigate("/app/user");
     } catch (err) {
       setOtp(null);
       setFormData(null);

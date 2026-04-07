@@ -14,14 +14,15 @@ export default function Login() {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      const data  = await http.post("/api/user/login", values);
-      const  {role}  = data.data;
+      const data = await http.post("/api/user/login", values);
+      const { role } = data.data;
       if (role === "admin") {
-        return toast.success("admin pannel");
+        return toast("Welcome admin");
       }
-      if (role === "user") {
-         toast.success("Welcome");
-        navigate("/app/user");
+      if (role === "user") { 
+        const fullname=data?.data?.username.split(" "); 
+        toast(`Welcome ${fullname[0] || "user"}`);
+        navigate("/app/user/dashboard");
       }
     } catch (err) {
       toast.error(err.response ? err.response.data.message : err.message);

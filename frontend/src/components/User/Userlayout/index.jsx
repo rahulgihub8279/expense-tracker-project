@@ -4,13 +4,11 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-import { Layout, Image, Menu, Button } from "antd";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Layout, Image, Menu, Button, theme } from "antd";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 const { Sider, Header, Content, Footer } = Layout;
-import useSWR from "swr";
-import fetcher from "../../../Utils/fetcher";
-import Loader from "../../shared/Loader";
-
+import { toast } from "react-toastify";
+import http from "../../../Utils/axiosBaseUrl";
 export default function Userlayout() {
   const items = [
     {
@@ -24,25 +22,31 @@ export default function Userlayout() {
       icon: <BarChartOutlined></BarChartOutlined>,
     },
   ];
+  const navigate = useNavigate();
+  const { pathname } = useLocation(); 
 
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const handleNavigate = (menu) => {
     navigate(menu.key);
   };
+  //* logout
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await http.get("/api/user/logout");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response ? err.response.data.message : err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   const {
-    data: session,
-    error,
-    isLoading,
-  } = useSWR("/api/user/session", fetcher);
-  
-  if(isLoading){
-    return <Loader></Loader>
-  }
-  if((!session && session?.role!=="user" )|| error){
-    return <Navigate to="/"></Navigate>
-  }
-  
+    token:{colorBgContainer,borderRadiusLG}
+  }=theme.useToken();
+
   return (
     <>
       <Layout className="min-h-screen!">
@@ -58,7 +62,7 @@ export default function Userlayout() {
           </div>
           <Menu
             className="mt-9!"
-            defaultSelectedKeys={"/app/user/dashboard"}
+            defaultSelectedKeys={pathname}
             theme="dark"
             items={items}
             onClick={handleNavigate}
@@ -70,10 +74,24 @@ export default function Userlayout() {
               icon={<MenuOutlined></MenuOutlined>}
               onClick={() => setOpen(!open)}
             ></Button>
-            <Button className="bg-red-500! text-white!">log out</Button>
+            <Button
+              className="bg-red-500! text-white!"
+              onClick={handleLogout}
+              loading={loading}
+            >
+              log out
+            </Button>
           </Header>
           {""}
-          <Content>
+          <Content 
+          style={{
+            margin:'4px 8px',
+            padding:4,
+            minHeight:280,
+            background:colorBgContainer,
+            borderRadius:borderRadiusLG
+          }}
+          >
             <Outlet></Outlet>
           </Content>
         </Layout>
