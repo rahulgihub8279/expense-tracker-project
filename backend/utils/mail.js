@@ -17,9 +17,8 @@ const sendMail = async (email, subject, template) => {
     };
     await config.sendMail(options);
     return true;
-
   } catch (err) {
     return false;
   }
 };
-export default sendMail
+export default sendMail;

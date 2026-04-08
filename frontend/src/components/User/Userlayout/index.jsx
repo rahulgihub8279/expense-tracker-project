@@ -1,6 +1,7 @@
 import {
   AppstoreAddOutlined,
   BarChartOutlined,
+  DollarOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
@@ -21,9 +22,14 @@ export default function Userlayout() {
       label: "Reports",
       icon: <BarChartOutlined></BarChartOutlined>,
     },
+    {
+      key: "/app/user/transaction",
+      label: "Transaction",
+      icon: <DollarOutlined></DollarOutlined>,
+    },
   ];
   const navigate = useNavigate();
-  const { pathname } = useLocation(); 
+  const { pathname } = useLocation();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,8 +50,8 @@ export default function Userlayout() {
     }
   };
   const {
-    token:{colorBgContainer,borderRadiusLG}
-  }=theme.useToken();
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
 
   return (
     <>
@@ -83,14 +89,14 @@ export default function Userlayout() {
             </Button>
           </Header>
           {""}
-          <Content 
-          style={{
-            margin:'4px 8px',
-            padding:4,
-            minHeight:280,
-            background:colorBgContainer,
-            borderRadius:borderRadiusLG
-          }}
+          <Content
+            style={{
+              margin: "4px 8px",
+              padding: 4,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
           >
             <Outlet></Outlet>
           </Content>

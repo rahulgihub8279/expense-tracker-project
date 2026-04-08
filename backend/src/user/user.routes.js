@@ -1,5 +1,10 @@
 import express from "express";
-import { createUser, loginUser,logoutUser, sendEmail } from "./user.controller.js";
+import {
+  createUser,
+  loginUser,
+  logoutUser,
+  sendEmail,
+} from "./user.controller.js";
 import { adminUserGuard } from "../../middleware/guardMiddleware.js";
 
 const userRouter = express.Router();
@@ -8,7 +13,7 @@ const userRouter = express.Router();
 userRouter.post("/signup", createUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/logout", logoutUser);
-userRouter.post("/sendmail", sendEmail); 
+userRouter.post("/sendmail", sendEmail);
 
 userRouter.get("/session", adminUserGuard, (req, res) => {
   return res.json(req.user);

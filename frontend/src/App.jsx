@@ -9,6 +9,7 @@ const Userlayout = lazy(() => import("./components/User/Userlayout"));
 const Dashboard = lazy(() => import("./components/User/Dashboard"));
 const Report = lazy(() => import("./components/User/Report"));
 const HomePage = lazy(() => import("../src/components/Home/HomePage"));
+const Transactions=lazy(()=> import("./components/User/Transactions"))
 
 function App() {
   return (
@@ -16,8 +17,7 @@ function App() {
       <Suspense fallback={<Loader></Loader>}>
         <Routes>
           <Route path="/" element={<HomePage></HomePage>}></Route>
-          <Route path="/signup" element={<Signup></Signup>}></Route>
-          <Route path="/app/user" element={<Userlayout></Userlayout>}></Route>
+          <Route path="/signup" element={<Signup></Signup>}></Route> 
           <Route
             path="/app/user"
             element={
@@ -29,11 +29,12 @@ function App() {
             <Route path="dashboard" element={<Dashboard></Dashboard>}></Route>
             <Route index element={<Dashboard></Dashboard>}></Route>
             <Route path="report" element={<Report></Report>}></Route>
+            <Route path="transaction" element={<Transactions></Transactions>}></Route>
           </Route>
           <Route path="/*" element={<BadRequest></BadRequest>}></Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>  
+    </BrowserRouter>   
   );
 }
 
