@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import useSWR, { mutate } from "swr";
+import http from "../../../Utils/axiosBaseUrl";
+import fetcher from "../../../Utils/fetcher";
+import formatDate from "../../../Utils/formatDate";
+
 import {
   DeleteOutlined,
   EditOutlined,
@@ -15,7 +20,7 @@ import {
   Select,
   Table,
 } from "antd";
-const {Item}=Form; 
+const { Item } = Form;
 
 export default function Transactions() {
   const [loading, setLoading] = useState(false);
@@ -28,7 +33,7 @@ export default function Transactions() {
       title: "Transaction Type",
       dataIndex: "transactionType",
       key: "transactionType",
-      className: "capitalize",
+      className: "capitalize font-bold",
     },
     {
       title: "Title",
@@ -58,6 +63,7 @@ export default function Transactions() {
       title: "Date",
       dataIndex: "createdAt",
       key: "date",
+      render: (date) => formatDate(date),
     },
     {
       title: "Action",
@@ -67,8 +73,9 @@ export default function Transactions() {
         <div className="flex gap-1">
           <Popconfirm
             title="Are you sure ?"
-            description="Once you update, you can also update !"
+            description="Once you update, you can also re-update !"
             onCancel={() => toast.info("changes discarded !")}
+            onConfirm={() => onEdit(obj)}
           >
             <Button
               type="text"
@@ -78,8 +85,9 @@ export default function Transactions() {
           </Popconfirm>
           <Popconfirm
             title="Are you sure ?"
-            description="Once you update, you can also update !"
+            description="Once you delete, you can't re-store !"
             onCancel={() => toast.info("Your data is unchanged !")}
+            onConfirm={() => onDelete(obj._id)}
           >
             <Button
               type="text"
@@ -91,6 +99,57 @@ export default function Transactions() {
       ),
     },
   ];
+  const {
+    data: transaction,
+    err,
+    isLoading,
+  } = useSWR("/api/transaction/get-transaction", fetcher);
+
+  const onFinish = async (values) => {
+    try {
+      setLoading(true);
+      await http.post("/api/transaction/create-transaction", values);
+      mutate("/api/transaction/get-transaction");
+      toast.success("Transaction created successfully");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+      setModal(false);
+    }
+  };
+  const onUpdate = async (values) => {
+    try {
+      setLoading(true);
+      await http.put(`/api/transaction/update-transaction/${edit._id}`, values);
+      mutate("/api/transaction/get-transaction");
+      toast.success("Transaction updated successfully");
+      setEdit(null);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+      setModal(false);
+    }
+  };
+  const onEdit = (obj) => {
+    setEdit(obj);
+    transactionForm.setFieldsValue(obj);
+    setModal(true);
+  };
+  const onDelete = async (id) => {
+    try {
+      setLoading(true);
+      await http.delete(`/api/transaction/delete-transaction/${id}`);
+      mutate("/api/transaction/get-transaction");
+      toast.success("Transaction deleted successfully");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="grid">
@@ -116,8 +175,9 @@ export default function Transactions() {
           }
         >
           <Table
+            loading={isLoading}
             columns={columns}
-            dataSource={[]}
+            dataSource={transaction?.data || []}
             scroll={{ x: "max-content" }}
           ></Table>
         </Card>
@@ -125,11 +185,19 @@ export default function Transactions() {
       {""}
       <Modal
         open={modal}
-        onCancel={() => setModal(false)}
+        onCancel={() => {
+          setModal(false);
+          transactionForm.resetFields();
+          setEdit(null);
+        }}
         title="Add new Transaction"
         footer={null}
       >
-        <Form layout="vertical" form={transactionForm}>
+        <Form
+          layout="vertical"
+          form={transactionForm}
+          onFinish={edit ? onUpdate : onFinish}
+        >
           <div className="grid md:grid-cols-2 gap-x-3">
             <Item
               label="Transactions"
@@ -172,9 +240,9 @@ export default function Transactions() {
               loading={loading}
               type="text"
               htmlType="submit"
-              className="font-semibold! text-white! bg-blue-600! py-4! w-full"
+              className={`font-semibold! text-white! ${edit ? "bg-orange-500!" : "bg-blue-600!"} py-4! w-full`}
             >
-              Submit
+              {edit ? "Update" : "Submit"}
             </Button>
           </Item>
         </Form>
