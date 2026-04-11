@@ -4,8 +4,13 @@ import {
   loginUser,
   logoutUser,
   sendEmail,
+  getAllUsers,
+  updateStatus,
 } from "./user.controller.js";
-import { adminUserGuard } from "../../middleware/guardMiddleware.js";
+import {
+  adminUserGuard,
+  adminGuard,
+} from "../../middleware/guardMiddleware.js";
 
 const userRouter = express.Router();
 
@@ -14,7 +19,8 @@ userRouter.post("/signup", createUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/logout", logoutUser);
 userRouter.post("/sendmail", sendEmail);
-
+userRouter.get("/get-all-users", adminGuard, getAllUsers);
+userRouter.put("/status/:id", adminGuard, updateStatus);
 userRouter.get("/session", adminUserGuard, (req, res) => {
   return res.json(req.user);
 });

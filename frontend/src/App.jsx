@@ -12,6 +12,7 @@ const HomePage = lazy(() => import("../src/components/Home/HomePage"));
 const Dashboard = lazy(() => import("./components/shared/Dashboard"));
 const Report = lazy(() => import("./components/shared/Report"));
 const Transactions = lazy(() => import("./components/shared/Transactions"));
+const Users = lazy(() => import("./components/shared/Users"));
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard></Dashboard>}></Route>
             <Route index element={<Dashboard></Dashboard>}></Route>
             <Route path="report" element={<Report></Report>}></Route>
+            <Route path="users" element={<Users></Users>}></Route>
             <Route
               path="transaction"
               element={<Transactions></Transactions>}

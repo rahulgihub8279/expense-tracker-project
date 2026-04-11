@@ -27,14 +27,26 @@ const invalid = async (res) => {
 };
 
 export const adminUserGuard = async (req, res, next) => {
-  const { authToken } = req.cookies; 
+  const { authToken } = req.cookies;
   if (!authToken) {
     return invalid(res);
-  } 
+  }
   const payload = jwt.verify(authToken, process.env.AUTH_SECRET);
   if (payload.role !== "user" && payload.role !== "admin") {
     return invalid(res);
   }
-  req.user=payload;
+  req.user = payload;
+  next();
+};
+export const adminGuard = async (req, res, next) => {
+  const { authToken } = req.cookies;
+  if (!authToken) {
+    return invalid(res);
+  }
+  const payload = jwt.verify(authToken, process.env.AUTH_SECRET);
+  if (payload.role !== "admin") {
+    return invalid(res);
+  }
+  req.user = payload;
   next();
 };

@@ -60,6 +60,9 @@ export const loginUser = async (req, res) => {
     if (!hashpass) {
       return res.status(401).json({ message: "incorrect password" });
     }
+    if (!user.status) {
+      return res.status(404).json({ message: "Not active member, contact admin" });
+    }
     const token = await createToken(user);
 
     res.cookie("authToken", token, {
@@ -96,10 +99,39 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-export const verifyToken = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
-    res.json("verification success");
+    const allUsers = await UserModel.find().sort({
+      createdAt: -1,
+    });
+    res.json({ data: allUsers });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message || "Internal server error",
+    });
+  }
+};
+
+export const updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true },
+    );
+    if (!user) {
+      res.json.status(404).json({
+        message: "user not found",
+      });
+    }
+    res.json({
+      message: "status updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message || "Internal server error",
+    });
   }
 };
